@@ -368,6 +368,12 @@ const matchmake = (movies: Movie[]) => {
 	mov2 = movies[indexMov2];
 };
 
+const refreshFilters = (filters) => {
+	for (filter of filters) {
+		console.log(filter);
+	}
+};
+
 onMount(async () => {
 	// const auth = await tmdb.auth();
 	// console.log('auth: ', auth);
@@ -379,17 +385,17 @@ onMount(async () => {
 </script>
 
 <main class="flex-grow">
-	<Filters/>
+	<Filters on:click={refreshFilters}/>
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
 			<div class="left flex-1">
-				<MoviePanel movie={mov1} secret={guessing} onClick={guessing = false}/>
+				<MoviePanel movie={mov1} secret={guessing} on:guess={guessing = false}/>
 			</div>
 			<div class="separator h-[33rem] rounded-3xl flex items-center justify-center w-1 z-10">
 				<p class="separator-text text-xl bg-inherit min-w-10 min-h-10 rounded-full transition hover:rotate-[360deg] text-center leading-10">OR</p>
 			</div>
 			<div class="right flex-1">
-				<MoviePanel movie={mov2} secret={guessing} onClick={guessing = false}/>
+				<MoviePanel movie={mov2} secret={guessing} on:guess={guessing = false}/>
 			</div>
 		</div>
 	{:else}

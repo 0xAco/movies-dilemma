@@ -36,10 +36,16 @@ const genres: Genre[] = [
 	{ id: 10752, name: 'Guerre' },
 	{ id: 37, name: 'Western' },
 ];
+
+let buttonClose: HTMLButtonElement;
+buttonClose.addEventListener('click', () => {});
 </script>
 
 <div class="overlay w-screen h-screen absolute left-0 top-0 flex items-center justify-center z-30">
-	<div class="filters flex flex-col p-5 rounded-3xl z-40">
+	<div class="filters flex flex-col p-5 rounded-3xl z-40 relative">
+		<button bind:this={buttonClose} class="filters-button w-10 h-10 rounded-full absolute -right-2 -top-2">
+			X
+		</button>
 		<!-- with_genres -->
 		<h2 class="filters-title">genre</h2> 
 		<div class="filters-group">
@@ -108,6 +114,11 @@ const genres: Genre[] = [
   margin-inline: auto;
   width: fit-content;
 	height: fit-content;
+}
+.filters-button {
+	font-family: "Modak";
+	background-color: var(--yellow);
+	color: var(--purple-accent);
 }
 .filters-title {
 	margin: 12px 0 10px 0;
