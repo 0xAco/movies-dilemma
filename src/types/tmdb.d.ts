@@ -27,6 +27,9 @@ type Discover = {
 	results: Movie[];
 };
 
+// gte stands for Greater Than or Equal
+// it is the minimum value
+// lte is the opposite : Lower Than or Equal
 type GteLte = {
 	gte: string | number; // YYYY-MM-DD, float
 	lte: string | number; // YYYY-MM-DD, float

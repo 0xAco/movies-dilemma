@@ -2,6 +2,7 @@
 import { onMount } from 'svelte';
 import tmdb from '../api/tmdb';
 import MoviePanel from './MoviePanel.svelte';
+import Filters from './Filters.svelte';
 
 const response: Discover = $state({
 	page: 1,
@@ -378,9 +379,7 @@ onMount(async () => {
 </script>
 
 <main class="flex-grow">
-	<div class="filters">
-
-	</div>
+	<Filters/>
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
 			<div class="left flex-1">
