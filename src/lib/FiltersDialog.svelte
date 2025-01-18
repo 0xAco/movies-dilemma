@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher } from 'svelte';
+const { onClose, onUpdate } = $props();
 
 let outputPeople: string = $state('');
 let outputVoteAverageGte: number = $state(0);
@@ -42,12 +42,6 @@ const genres: Genre[] = [
 	{ id: 37, name: 'Western' },
 ];
 
-const dispatch = createEventDispatcher();
-
-const handleClose = () => {
-	dispatch('close');
-};
-
 const handleUpdate = () => {
 	const newFilters: Filterables = {
 		with_genres: [],
@@ -62,8 +56,8 @@ const handleUpdate = () => {
 		vote_average_gte: { gte: outputVoteAverageGte, lte: outputVoteAverageLte },
 		vote_count_gte: { gte: outputVoteCountGte, lte: outputVoteCountLte },
 	};
-	dispatch('update', newFilters);
-	handleClose();
+	onUpdate(newFilters);
+	onClose();
 };
 </script>
 
@@ -71,7 +65,7 @@ const handleUpdate = () => {
 	<div class="filters flex flex-col p-5 rounded-3xl z-40 relative">
 
     <!-- close button -->
-    <button onclick={handleClose} class="filters-button w-10 h-10 rounded-full absolute -right-2 -top-2">
+    <button onclick={onClose} class="filters-button w-10 h-10 rounded-full absolute -right-2 -top-2">
 			X
 		</button>
 

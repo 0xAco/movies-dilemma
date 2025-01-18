@@ -362,7 +362,7 @@ const randomIndex = (limit: number) => {
 };
 
 const matchmake = (movies: Movie[]) => {
-	guessing = false;
+	guessing = true;
 	const indexMov1 = randomIndex(movies.length - 1);
 	let indexMov2 = randomIndex(movies.length - 1);
 	while (indexMov1 === indexMov2) indexMov2 = randomIndex(movies.length - 1);
@@ -370,13 +370,17 @@ const matchmake = (movies: Movie[]) => {
 	mov2 = movies[indexMov2];
 };
 
+const showResults = () => {
+	guessing = false;
+};
+
 const closeFilters = () => {
 	filterOpen = false;
 };
 
-const refreshFilters = (updatedFilters) => {
+const refreshFilters = (updatedFilters: Filterables) => {
 	filters = updatedFilters;
-	console.log(filters);
+	console.log($state.snapshot(filters));
 };
 
 onMount(async () => {
@@ -390,7 +394,7 @@ onMount(async () => {
 
 <main class="flex-grow">
 	{#if filterOpen}
-    <FiltersDialog on:close={closeFilters} on:update={refreshFilters}/>
+    <FiltersDialog onClose={closeFilters} onUpdate={refreshFilters}/>
   {/if}
   {#if filters}
     <div>oe y'a des filtres check la console frr</div>
@@ -398,13 +402,13 @@ onMount(async () => {
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
 			<div class="left flex-1">
-				<MoviePanel movie={mov1} secret={guessing} on:guess={guessing = false}/>
+				<MoviePanel movie={mov1} secret={guessing} onGuess={showResults}/>
 			</div>
 			<div class="separator h-[33rem] rounded-3xl flex items-center justify-center w-1 z-10">
 				<p class="separator-text text-xl bg-inherit min-w-10 min-h-10 rounded-full transition hover:rotate-[360deg] text-center leading-10">OR</p>
 			</div>
 			<div class="right flex-1">
-				<MoviePanel movie={mov2} secret={guessing} on:guess={guessing = false}/>
+				<MoviePanel movie={mov2} secret={guessing} onGuess={showResults}/>
 			</div>
 		</div>
 	{:else}
