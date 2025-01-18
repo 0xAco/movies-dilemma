@@ -1,4 +1,7 @@
 <script lang="ts">
+import { createEventDispatcher } from 'svelte';
+
+let outputPeople: string = $state('');
 let outputVoteAverageGte: number = $state(0);
 let outputVoteAverageLte: number = $state(0);
 let outputVoteCountGte: number = $state(0);
@@ -8,6 +11,7 @@ let yearLte: number = $state(0);
 const yearMax = new Date().getFullYear();
 
 // default values
+outputPeople = '';
 outputVoteAverageGte = 5;
 outputVoteAverageLte = 5;
 outputVoteCountGte = 500;
@@ -16,6 +20,7 @@ yearGte = 1895;
 yearLte = yearMax;
 
 const genres: Genre[] = [
+	{ id: -1, name: 'Tous' },
 	{ id: 28, name: 'Action' },
 	{ id: 12, name: 'Aventure' },
 	{ id: 16, name: 'Animation' },
@@ -37,15 +42,39 @@ const genres: Genre[] = [
 	{ id: 37, name: 'Western' },
 ];
 
-let buttonClose: HTMLButtonElement;
-buttonClose.addEventListener('click', () => {});
+const dispatch = createEventDispatcher();
+
+const handleClose = () => {
+	dispatch('close');
+};
+
+const handleUpdate = () => {
+	const newFilters: Filterables = {
+		with_genres: [],
+		with_people:
+			outputPeople.length > 0
+				? outputPeople.split(',').map((w) => w.trim())
+				: [],
+		primary_release_date_gte: {
+			gte: `${yearGte}-01-01`,
+			lte: `${yearLte}-12-31`,
+		},
+		vote_average_gte: { gte: outputVoteAverageGte, lte: outputVoteAverageLte },
+		vote_count_gte: { gte: outputVoteCountGte, lte: outputVoteCountLte },
+	};
+	dispatch('update', newFilters);
+	handleClose();
+};
 </script>
 
 <div class="overlay w-screen h-screen absolute left-0 top-0 flex items-center justify-center z-30">
 	<div class="filters flex flex-col p-5 rounded-3xl z-40 relative">
-		<button bind:this={buttonClose} class="filters-button w-10 h-10 rounded-full absolute -right-2 -top-2">
+
+    <!-- close button -->
+    <button onclick={handleClose} class="filters-button w-10 h-10 rounded-full absolute -right-2 -top-2">
 			X
 		</button>
+
 		<!-- with_genres -->
 		<h2 class="filters-title">genre</h2> 
 		<div class="filters-group">
@@ -61,7 +90,7 @@ buttonClose.addEventListener('click', () => {});
 		<h2 class="filters-title">acteur·ice·s</h2>
 		<div class="filters-group">
 			<label for="with_people">acteur·ice (séparé·e·s par des virgules) :</label>
-			<input type="text" name="with_people" id="with_people"/>
+			<input type="text" name="with_people" id="with_people" bind:value={outputPeople}/>
 		</div>
 
 		<!-- primary_release_year -->
@@ -100,6 +129,8 @@ buttonClose.addEventListener('click', () => {});
 			<input type="range" name="vote_count-lte" id="vote_count-lte" min="0" max="5000" step="50" bind:value={outputVoteCountLte}/>
 			<output id="vote_count-lte-output">{outputVoteCountLte}</output>
 		</div>
+
+    <button onclick={handleUpdate} class="filters-button rounded-3xl py-3 mt-2 w-44 self-center uppercase">valider</button>
 	</div>
 </div>
 
@@ -134,8 +165,8 @@ buttonClose.addEventListener('click', () => {});
 
 	input, select {
 		outline: none;
-		color: var(--purple-dark);
-		background-color: var(--yellow);
+		color: white;
+		background-color: var(--pink);
 		border-radius: 99px;
 		padding: 4px 10px;
 	}

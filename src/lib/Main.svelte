@@ -2,7 +2,7 @@
 import { onMount } from 'svelte';
 import tmdb from '../api/tmdb';
 import MoviePanel from './MoviePanel.svelte';
-import Filters from './Filters.svelte';
+import FiltersDialog from './FiltersDialog.svelte';
 
 const response: Discover = $state({
 	page: 1,
@@ -354,6 +354,8 @@ const response: Discover = $state({
 let mov1: Movie | null = $state(null);
 let mov2: Movie | null = $state(null);
 let guessing = $state(true);
+let filterOpen: boolean = $state(true);
+let filters: Filterables | null = $state(null);
 
 const randomIndex = (limit: number) => {
 	return Math.floor(Math.random() * limit);
@@ -368,15 +370,17 @@ const matchmake = (movies: Movie[]) => {
 	mov2 = movies[indexMov2];
 };
 
-const refreshFilters = (filters) => {
-	for (filter of filters) {
-		console.log(filter);
-	}
+const closeFilters = () => {
+	filterOpen = false;
+};
+
+const refreshFilters = (updatedFilters) => {
+	filters = updatedFilters;
+	console.log(filters);
 };
 
 onMount(async () => {
 	// const auth = await tmdb.auth();
-	// console.log('auth: ', auth);
 	// response = await tmdb.discover();
 	console.log($state.snapshot(await response));
 	matchmake(response.results);
@@ -385,7 +389,12 @@ onMount(async () => {
 </script>
 
 <main class="flex-grow">
-	<Filters on:click={refreshFilters}/>
+	{#if filterOpen}
+    <FiltersDialog on:close={closeFilters} on:update={refreshFilters}/>
+  {/if}
+  {#if filters}
+    <div>oe y'a des filtres check la console frr</div>
+  {/if}
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
 			<div class="left flex-1">

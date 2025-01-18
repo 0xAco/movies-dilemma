@@ -78,3 +78,11 @@ type DiscoverFilters = {
 
 	year?: number;
 };
+
+type Filterables = {
+	with_genres?: number[];
+	with_people?: string[];
+	primary_release_date_gte?: GteLte; // YYYY-MM-DD
+	vote_average_gte?: GteLte; // float
+	vote_count_gte?: GteLte; // number
+};
