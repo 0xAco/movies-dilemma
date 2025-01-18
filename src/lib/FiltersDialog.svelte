@@ -12,8 +12,8 @@ const yearMax = new Date().getFullYear();
 
 // default values
 outputPeople = '';
-outputVoteAverageGte = 5;
-outputVoteAverageLte = 5;
+outputVoteAverageGte = 0;
+outputVoteAverageLte = 10;
 outputVoteCountGte = 500;
 outputVoteCountLte = 5000;
 yearGte = 1895;
@@ -35,12 +35,29 @@ const genres: Genre[] = [
 	{ id: 10402, name: 'Musique' },
 	{ id: 9648, name: 'Mystère' },
 	{ id: 10749, name: 'Romance' },
-	{ id: 878, name: 'Science-Fiction' },
+	{ id: 878, name: 'Sci-Fi' },
 	{ id: 10770, name: 'Téléfilm' },
 	{ id: 53, name: 'Thriller' },
 	{ id: 10752, name: 'Guerre' },
 	{ id: 37, name: 'Western' },
 ];
+
+const handleCheckboxChange = (event: Event): void => {
+	const source = event.target as HTMLInputElement;
+	if (!source || source.id !== '-1') return;
+
+	const checkboxes: HTMLInputElement[] = Array.from(
+		document.querySelectorAll('input[type="checkbox"]'),
+	);
+	const isource = checkboxes.findIndex((c) => c.id === source.id);
+	if (isource > -1) checkboxes.splice(isource, 1);
+	if (checkboxes.length > 0) {
+		for (const box of checkboxes) {
+			box.checked = source.checked;
+			box.disabled = source.checked;
+		}
+	}
+};
 
 const handleUpdate = () => {
 	const newFilters: Filterables = {
@@ -62,7 +79,7 @@ const handleUpdate = () => {
 </script>
 
 <div class="overlay w-screen h-screen absolute left-0 top-0 flex items-center justify-center z-30">
-	<div class="filters flex flex-col p-5 rounded-3xl z-40 relative">
+	<form class="filters flex flex-col p-5 rounded-3xl z-40 relative max-w-xl">
 
     <!-- close button -->
     <button onclick={onClose} class="filters-button w-10 h-10 rounded-full absolute -right-2 -top-2">
@@ -70,14 +87,14 @@ const handleUpdate = () => {
 		</button>
 
 		<!-- with_genres -->
-		<h2 class="filters-title">genre</h2> 
-		<div class="filters-group">
-			<label for="with_genres">genres : </label>
-			<select name="with_genres" id="with_genres">
-				{#each genres as genre}
-					<option value="{genre.id}">{genre.name}</option>
-				{/each}
-			</select>
+		<h2 class="filters-title">genres</h2> 
+		<div class="grid grid-cols-4">
+			{#each genres as genre}
+				<label for="{`${genre.id}`}" class="filters-group checkbox-container">{genre.name}
+					<input type="checkbox" onchange={handleCheckboxChange} id="{`${genre.id}`}" value="{genre.id}"/>
+					<span class="checkbox-box"></span>
+				</label>
+			{/each}
 		</div>
 
 		<!-- with_people -->
@@ -125,7 +142,7 @@ const handleUpdate = () => {
 		</div>
 
     <button onclick={handleUpdate} class="filters-button rounded-3xl py-3 mt-2 w-44 self-center uppercase">valider</button>
-	</div>
+	</form>
 </div>
 
 <style>
@@ -157,12 +174,73 @@ const handleUpdate = () => {
 	margin-bottom: 4px;
 	padding-left: 12px;
 
-	input, select {
+	input {
 		outline: none;
 		color: white;
 		background-color: var(--pink);
 		border-radius: 99px;
 		padding: 4px 10px;
 	}
+}
+
+/* CHECKBOX */
+.checkbox-container {
+	position: relative;
+	cursor: pointer;
+	padding-left: 20px;
+
+	/* hide default */
+	input {
+		cursor: pointer;
+		position: absolute;
+		opacity: 0;
+		height: 0;
+		width: 0;
+	}
+	/* create a custom */
+	.checkbox-box {
+		position: absolute;
+		top: 4px;
+		left: 0;
+		height: 16px;
+		width: 16px;
+		background-color: var(--purple-dark);
+	}
+	/* when input is checked > show box */
+	input:checked ~ .checkbox-box:after {
+		display: block;
+	}
+	/* style for the box */
+	.checkbox-box:after {
+		left: 6px;
+		top: 2px;
+		width: 5px;
+		height: 10px;
+		border: solid var(--yellow);
+		border-width: 0 2px 2px 0;
+		-webkit-transform: rotate(45deg);
+		-ms-transform: rotate(45deg);
+		transform: rotate(45deg);
+	}
+	/* checked */
+	input:checked ~ .checkbox-box {
+		background-color: var(--pink);
+	}
+	/* disabled */
+	input:disabled {
+		~ .checkbox-box {
+			filter: brightness(.7);
+		}
+	}
+}
+/* hover box */
+.checkbox-container:hover input ~ .checkbox-box {
+  cursor: pointer;
+}
+/* box that does the check */
+.checkbox-box:after {
+  content: "";
+  position: absolute;
+  display: none;
 }
 </style>
