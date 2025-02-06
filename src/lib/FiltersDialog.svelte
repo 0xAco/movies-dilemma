@@ -3,9 +3,9 @@ import { DEFAULT_FILTERS } from '../types/constants';
 import { onMount } from 'svelte';
 
 interface FiltersDialogProps {
-	filters: Filterables,
-	onClose: () => void,
-	onUpdate: (filters: Filterables) => void,
+	filters: Filterables;
+	onClose: () => void;
+	onUpdate: (filters: Filterables) => void;
 }
 const { filters, onClose, onUpdate }: FiltersDialogProps = $props();
 
@@ -14,18 +14,9 @@ let outputVoteAverageGte: number = $state(0);
 let outputVoteAverageLte: number = $state(0);
 let outputVoteCountGte: number = $state(0);
 let outputVoteCountLte: number = $state(0);
-// biome-ignore lint/style/useConst: need let to bind in svelte
 let yearGte: number | undefined = $state();
-// biome-ignore lint/style/useConst: need let to bind in svelte
 let yearLte: number | undefined = $state();
 const yearMax = new Date().getFullYear();
-
-// default values
-outputPeople = '';
-outputVoteAverageGte = DEFAULT_FILTERS.vote_average_gte.gte as number;
-outputVoteAverageLte = DEFAULT_FILTERS.vote_average_gte.lte as number;
-outputVoteCountGte = DEFAULT_FILTERS.vote_count_gte.gte as number;
-outputVoteCountLte = DEFAULT_FILTERS.vote_count_gte.lte as number;
 
 const genres: Genre[] = [
 	{ id: -1, name: 'Tous' },
@@ -111,13 +102,45 @@ const handleUpdate = (event: Event) => {
 };
 
 // load filters passed through params
-const loadFilters = filters: Filterables => {
-	const genreTous = document.getElementById('-1') as HTMLInputElement;
-	genreTous.click();
-}
+const loadFilters = (filters: Filterables) => {
+	// genres
+	if (filters.with_genres) {
+		for (const genre of filters.with_genres) {
+			document.getElementById(`${genre.id}`)?.click();
+		}
+	} else {
+		const genreTous = document.getElementById('-1') as HTMLInputElement;
+		genreTous.click();
+	}
+	// acteur·ice·s
+	outputPeople = filters.with_people ? filters.with_people.join(', ') : '';
+	// année de sortie
+	if (filters.primary_release_date_gte.gte) {
+		const string: string = `${filters.primary_release_date_gte.gte}`;
+		yearGte = Number.parseInt(string.slice(0, 4));
+	}
+	if (filters.primary_release_date_gte.lte) {
+		const string: string = `${filters.primary_release_date_gte.lte}`;
+		yearLte = Number.parseInt(string.slice(0, 4));
+	}
+	// moyenne
+	outputVoteAverageGte = filters.vote_average_gte.gte
+		? (filters.vote_average_gte.gte as number)
+		: (DEFAULT_FILTERS.vote_average_gte.gte as number);
+	outputVoteAverageLte = filters.vote_average_gte.lte
+		? (filters.vote_average_gte.lte as number)
+		: (DEFAULT_FILTERS.vote_average_gte.lte as number);
+	// votes
+	outputVoteCountGte = filters.vote_count_gte.gte
+		? (filters.vote_count_gte.gte as number)
+		: (DEFAULT_FILTERS.vote_count_gte.gte as number);
+	outputVoteCountLte = filters.vote_count_gte.lte
+		? (filters.vote_count_gte.lte as number)
+		: (DEFAULT_FILTERS.vote_count_gte.lte as number);
+};
 
 onMount(() => {
-	loadFilters();
+	loadFilters(filters);
 });
 </script>
 
@@ -147,7 +170,7 @@ onMount(() => {
 		<div class="filters-group flex-col justify-start items-start gap-1">
 			<label for="with_people">acteur·ice (séparé·e·s par des virgules) :</label>
 			<!-- todo: remove autocomplete on inputs -->
-			<input type="text" name="with_people" id="with_people" placeholder="ex: Lennifer Jawrance; Thimoté Chalumeau, Gady Lala, Perdo Pacsal, Banny Doon" class="w-full" bind:value={outputPeople}/>
+			<input type="text" name="with_people" id="with_people" placeholder="ex: Lennifer Jawrance; Thimoté Chalumeau, Gady Lala, Perdo Pacsal, Banny Doon" class="w-full" bind:value={outputPeople} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
 		</div>
 
 		<!-- primary_release_year -->

@@ -394,19 +394,21 @@ const closeFilters = () => {
 
 const refreshFilters = (updatedFilters: Filterables) => {
 	filters = updatedFilters;
+	console.log('NEW FILTERS: ', updatedFilters);
+	// todo: update the recap component
 };
 
 onMount(async () => {
 	// const auth = await tmdb.auth();
 	// response = await tmdb.discover();
-	console.log($state.snapshot(await response));
+	// console.log($state.snapshot(await response));
 	matchmake(response.results);
 	// todo: design + onClick to reveal results
 });
 </script>
 
 <main class="flex-grow">
-	<button onclick={openFilters} class="filters-button">
+	<button onclick={openFilters} class="filters-button absolute right-4 top-4 rounded-xl p-4 uppercase">
 		gérer les filtres
 	</button>
 	{#if filterOpen}
@@ -439,4 +441,10 @@ onMount(async () => {
 	.separator-text {
 		font-family: "Modak";
 	}
+  .filters-button {
+    background-color: var(--yellow);
+    color: var(--purple-accent);
+    box-shadow: 6px 6px var(--pink);
+    font-family: 'Modak';
+  }
 </style>

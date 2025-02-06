@@ -8,40 +8,51 @@ interface Props {
 
 const { filters }: Props = $props();
 $state.snapshot(filters);
+let filtersMap: Map<string, (undefined | string)[]> = $state(new Map());
 
-const yearGte = filters.primary_release_date_gte.gte;
-const yearLte = filters.primary_release_date_gte.lte;
-const voteCountGte = filters.vote_count_gte.gte;
-const voteCountLte = filters.vote_count_gte.lte;
-const voteAverageGte = filters.vote_average_gte.gte;
-const voteAverageLte = filters.vote_average_gte.lte;
-const filtersMap = new Map([
-	['genres', filters.with_genres.map((g) => g.name)],
-	['acteur·ice·s', filters.with_people],
-	['année', [`${yearGte}`.slice(0, 4), `${yearLte}`.slice(0, 4)]],
-	['score', [`${voteAverageGte}`, `${voteAverageLte}`]],
-	['nombre de votes', [`${voteCountGte}`, `${voteCountLte}`]],
-]);
+const updateFilters = (filters: Filterables) => {
+	const yearGte = filters.primary_release_date_gte.gte;
+	const yearLte = filters.primary_release_date_gte.lte;
+	const voteCountGte = filters.vote_count_gte.gte;
+	const voteCountLte = filters.vote_count_gte.lte;
+	const voteAverageGte = filters.vote_average_gte.gte;
+	const voteAverageLte = filters.vote_average_gte.lte;
+	filtersMap.clear();
+	filtersMap = new Map([
+		['genres', filters.with_genres.map((g) => g.name)],
+		['acteur·ice·s', filters.with_people],
+		['année', [`${yearGte}`.slice(0, 4), `${yearLte}`.slice(0, 4)]],
+		['score', [`${voteAverageGte}`, `${voteAverageLte}`]],
+		['nombre de votes', [`${voteCountGte}`, `${voteCountLte}`]],
+	]);
 
-for (const filter of filtersMap) {
-	if (filter[1].every((v) => v === '')) filtersMap.delete(filter[0]);
-}
+	for (const filter of filtersMap) {
+		if (filter[1].every((v) => v === '')) filtersMap.delete(filter[0]);
+	}
+	console.log(filtersMap);
+};
 
-console.log(filtersMap);
+updateFilters(filters);
 
-const handleRootEnter = () => {
+const handleRootEnter = (event: Event) => {
+	const source = event.target as HTMLElement;
+	source.classList.remove('rounded-full');
+	source.classList.add('rounded-3xl');
 	filtersContent.classList.remove('-hidden');
 	filtersIcon.classList.add('-hidden');
 };
 
-const handleRootLeave = () => {
+const handleRootLeave = (event: Event) => {
+	const source = event.target as HTMLElement;
+	source.classList.remove('rounded-2xl');
+	source.classList.add('rounded-full');
 	filtersContent.classList.add('-hidden');
 	filtersIcon.classList.remove('-hidden');
 };
 </script>
 
-<aside onmouseenter={handleRootEnter} onmouseleave={handleRootLeave} class="filters-recap flex flex-col gap-4 absolute left-4 top-4 rounded-xl p-4">
-  <i bind:this={filtersIcon} class="icon modak uppercase">voir les filtres</i>
+<aside onmouseenter={handleRootEnter} onmouseleave={handleRootLeave} class="filters-recap flex flex-col gap-4 absolute right-3 top-14 rounded-full p-4">
+  <i bind:this={filtersIcon} class="icon modak uppercase text-2xl">🔎</i>
   <div bind:this={filtersContent} class="content -hidden">
     {#each filtersMap as filter}
       <div class="flex flex-col mb-3">
