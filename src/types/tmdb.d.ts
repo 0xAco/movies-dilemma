@@ -17,7 +17,7 @@ type Movie = {
 
 type Genre = {
 	id: number;
-	name: string;
+	name?: string;
 };
 
 type Discover = {
@@ -80,9 +80,14 @@ type DiscoverFilters = {
 };
 
 type Filterables = {
-	with_genres?: number[];
-	with_people?: string[];
-	primary_release_date_gte?: GteLte; // YYYY-MM-DD
-	vote_average_gte?: GteLte; // float
-	vote_count_gte?: GteLte; // number
+	with_genres: Genre[];
+	with_people: string[];
+	primary_release_date_gte: GteLte; // YYYY-MM-DD
+	vote_average_gte: GteLte; // float
+	vote_count_gte: GteLte; // number
+};
+
+type DoubleRangeSliderValues = {
+	lower: number;
+	upper: number;
 };

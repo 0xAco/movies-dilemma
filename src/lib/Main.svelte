@@ -3,6 +3,8 @@ import { onMount } from 'svelte';
 import tmdb from '../api/tmdb';
 import MoviePanel from './MoviePanel.svelte';
 import FiltersDialog from './FiltersDialog.svelte';
+import FiltersRecap from './FiltersRecap.svelte';
+import { DEFAULT_FILTERS } from '../types/constants';
 
 const response: Discover = $state({
 	page: 1,
@@ -355,7 +357,7 @@ let mov1: Movie | null = $state(null);
 let mov2: Movie | null = $state(null);
 let guessing = $state(true);
 let filterOpen: boolean = $state(true);
-let filters: Filterables | null = $state(null);
+let filters: Filterables = $state(DEFAULT_FILTERS);
 
 const randomIndex = (limit: number) => {
 	return Math.floor(Math.random() * limit);
@@ -370,8 +372,20 @@ const matchmake = (movies: Movie[]) => {
 	mov2 = movies[indexMov2];
 };
 
-const showResults = () => {
+const showResults = (movie: Movie) => {
+	// cant guess if no movie is loaded
+	if (!mov1 || !mov2) return;
+	const isAnswerRight =
+		movie.vote_average >= mov1?.vote_average &&
+		movie.vote_average >= mov2.vote_average;
 	guessing = false;
+
+	// results reveal
+	alert(isAnswerRight ? 'yay' : 'u suk');
+};
+
+const openFilters = () => {
+	filterOpen = true;
 };
 
 const closeFilters = () => {
@@ -380,7 +394,6 @@ const closeFilters = () => {
 
 const refreshFilters = (updatedFilters: Filterables) => {
 	filters = updatedFilters;
-	console.log($state.snapshot(filters));
 };
 
 onMount(async () => {
@@ -393,11 +406,14 @@ onMount(async () => {
 </script>
 
 <main class="flex-grow">
+	<button onclick={openFilters} class="filters-button">
+		gérer les filtres
+	</button>
 	{#if filterOpen}
-    <FiltersDialog onClose={closeFilters} onUpdate={refreshFilters}/>
+    <FiltersDialog filters={filters} onClose={closeFilters} onUpdate={refreshFilters}/>
   {/if}
-  {#if filters}
-    <div>oe y'a des filtres check la console frr</div>
+  {#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) }
+    <FiltersRecap filters={filters}/>
   {/if}
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
@@ -405,7 +421,7 @@ onMount(async () => {
 				<MoviePanel movie={mov1} secret={guessing} onGuess={showResults}/>
 			</div>
 			<div class="separator h-[33rem] rounded-3xl flex items-center justify-center w-1 z-10">
-				<p class="separator-text text-xl bg-inherit min-w-10 min-h-10 rounded-full transition hover:rotate-[360deg] text-center leading-10">OR</p>
+				<p class="separator-text text-xl bg-inherit min-w-10 min-h-10 rounded-full transition hover:rotate-[360deg] text-center leading-10 cursor-default">OR</p>
 			</div>
 			<div class="right flex-1">
 				<MoviePanel movie={mov2} secret={guessing} onGuess={showResults}/>
