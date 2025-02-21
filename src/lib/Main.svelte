@@ -394,8 +394,6 @@ const closeFilters = () => {
 
 const refreshFilters = (updatedFilters: Filterables) => {
 	filters = updatedFilters;
-	console.log('NEW FILTERS: ', updatedFilters);
-	// todo: update the recap component
 };
 
 onMount(async () => {
@@ -412,7 +410,7 @@ onMount(async () => {
 		gérer les filtres
 	</button>
 	{#if filterOpen}
-    <FiltersDialog filters={filters} onClose={closeFilters} onUpdate={refreshFilters}/>
+    <FiltersDialog {filters} onClose={closeFilters} onUpdate={refreshFilters}/>
   {/if}
   {#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) }
     <FiltersRecap filters={filters}/>

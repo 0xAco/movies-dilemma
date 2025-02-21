@@ -6,10 +6,6 @@ interface Props {
 	filters: Filterables;
 }
 
-const { filters }: Props = $props();
-$state.snapshot(filters);
-let filtersMap: Map<string, (undefined | string)[]> = $state(new Map());
-
 const updateFilters = (filters: Filterables) => {
 	const yearGte = filters.primary_release_date_gte.gte;
 	const yearLte = filters.primary_release_date_gte.lte;
@@ -29,12 +25,14 @@ const updateFilters = (filters: Filterables) => {
 	for (const filter of filtersMap) {
 		if (filter[1].every((v) => v === '')) filtersMap.delete(filter[0]);
 	}
-	console.log(filtersMap);
 };
 
-updateFilters(filters);
+const { filters }: Props = $props();
+let filtersMap: Map<string, (undefined | string)[]> = $state(new Map());
+updateFilters($state.snapshot(filters));
 
 const handleRootEnter = (event: Event) => {
+	updateFilters(filters);
 	const source = event.target as HTMLElement;
 	source.classList.remove('rounded-full');
 	source.classList.add('rounded-3xl');
@@ -53,11 +51,11 @@ const handleRootLeave = (event: Event) => {
 
 <aside onmouseenter={handleRootEnter} onmouseleave={handleRootLeave} class="filters-recap flex flex-col gap-4 absolute right-3 top-14 rounded-full p-4">
   <i bind:this={filtersIcon} class="icon modak uppercase text-2xl">🔎</i>
-  <div bind:this={filtersContent} class="content -hidden">
+  <div bind:this={filtersContent} class="content -hidden max-w-xs">
     {#each filtersMap as filter}
       <div class="flex flex-col mb-3">
         <h3 class="modak font-bold uppercase text-lg">{filter[0]}</h3>
-        <div>{filter[1].join(', ')}</div>
+        <div class="text-justify">{filter[1].join(', ')}</div>
       </div>
     {/each}
   </div>
