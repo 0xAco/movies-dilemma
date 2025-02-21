@@ -356,6 +356,7 @@ const response: Discover = $state({
 let mov1: Movie | null = $state(null);
 let mov2: Movie | null = $state(null);
 let guessing = $state(true);
+let winnerId: number | null = $state(null);
 let filterOpen: boolean = $state(true);
 let filters: Filterables = $state(DEFAULT_FILTERS);
 
@@ -370,17 +371,31 @@ const matchmake = (movies: Movie[]) => {
 	while (indexMov1 === indexMov2) indexMov2 = randomIndex(movies.length - 1);
 	mov1 = movies[indexMov1];
 	mov2 = movies[indexMov2];
+	winnerId = mov1.vote_average > mov2.vote_average ? mov1.id : mov2.id;
 };
 
 const showResults = (movie: Movie) => {
 	// cant guess if no movie is loaded
 	if (!mov1 || !mov2) return;
 	const isAnswerRight =
-		movie.vote_average >= mov1?.vote_average &&
+		movie.vote_average >= mov1.vote_average &&
 		movie.vote_average >= mov2.vote_average;
 	guessing = false;
 
 	// results reveal
+	if (isAnswerRight) {
+	} else {
+		const farts = [
+			new Audio('sounds/498.mp3'),
+			new Audio('sounds/500.mp3'),
+			new Audio('sounds/503.mp3'),
+		].sort((a, b) => 0.5 - Math.random());
+		if (Math.random() < 0.1) {
+			farts[0].play();
+		}
+		// plus tu es nul, plus on te pète dessus
+		// todo: système de streak
+	}
 	alert(isAnswerRight ? 'yay' : 'u suk');
 };
 
@@ -401,7 +416,6 @@ onMount(async () => {
 	// response = await tmdb.discover();
 	// console.log($state.snapshot(await response));
 	matchmake(response.results);
-	// todo: design + onClick to reveal results
 });
 </script>
 
@@ -418,13 +432,13 @@ onMount(async () => {
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
 			<div class="left flex-1">
-				<MoviePanel movie={mov1} secret={guessing} onGuess={showResults}/>
+				<MoviePanel movie={mov1} secret={guessing} result={winnerId} onGuess={showResults}/>
 			</div>
 			<div class="separator h-[33rem] rounded-3xl flex items-center justify-center w-1 z-10">
 				<p class="separator-text text-xl bg-inherit min-w-10 min-h-10 rounded-full transition hover:rotate-[360deg] text-center leading-10 cursor-default">OR</p>
 			</div>
 			<div class="right flex-1">
-				<MoviePanel movie={mov2} secret={guessing} onGuess={showResults}/>
+				<MoviePanel movie={mov2} secret={guessing} result={winnerId} onGuess={showResults}/>
 			</div>
 		</div>
 	{:else}
