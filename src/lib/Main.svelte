@@ -385,12 +385,15 @@ const showResults = (movie: Movie) => {
 	// results reveal
 	if (isAnswerRight) {
 	} else {
-		const farts = [
-			new Audio('sounds/498.mp3'),
-			new Audio('sounds/500.mp3'),
-			new Audio('sounds/503.mp3'),
-		].sort((a, b) => 0.5 - Math.random());
+		// 10% chance to fart
 		if (Math.random() < 0.1) {
+			// shuffle farts
+			const farts = [
+				new Audio('sounds/498.mp3'),
+				new Audio('sounds/500.mp3'),
+				new Audio('sounds/503.mp3'),
+			].sort((a, b) => 0.5 - Math.random());
+			// launch
 			farts[0].play();
 		}
 		// plus tu es nul, plus on te pète dessus
@@ -426,19 +429,19 @@ onMount(async () => {
 	{#if filterOpen}
     <FiltersDialog {filters} onClose={closeFilters} onUpdate={refreshFilters}/>
   {/if}
-  {#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) }
+  {#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)}
     <FiltersRecap filters={filters}/>
   {/if}
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex items-center w-auto min-h-full">
 			<div class="left flex-1">
-				<MoviePanel movie={mov1} secret={guessing} result={winnerId} onGuess={showResults}/>
+				<MoviePanel movie={mov1} secret={guessing} {winnerId} onGuess={showResults}/>
 			</div>
 			<div class="separator h-[33rem] rounded-3xl flex items-center justify-center w-1 z-10">
 				<p class="separator-text text-xl bg-inherit min-w-10 min-h-10 rounded-full transition hover:rotate-[360deg] text-center leading-10 cursor-default">OR</p>
 			</div>
 			<div class="right flex-1">
-				<MoviePanel movie={mov2} secret={guessing} result={winnerId} onGuess={showResults}/>
+				<MoviePanel movie={mov2} secret={guessing} {winnerId} onGuess={showResults}/>
 			</div>
 		</div>
 	{:else}
