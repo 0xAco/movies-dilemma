@@ -6,7 +6,7 @@ import FiltersDialog from './FiltersDialog.svelte';
 import FiltersRecap from './FiltersRecap.svelte';
 import { DEFAULT_FILTERS } from '../types/constants';
 
-const response: Discover = $state({
+const responseDefault: Discover = $state({
 	page: 1,
 	results: [
 		{
@@ -353,12 +353,20 @@ const response: Discover = $state({
 	total_pages: 47820,
 	total_results: 956393,
 });
+const emptyDiscover: Discover = {
+    page: 0,
+    total_pages: 0,
+    total_results: 0,
+    results: [],
+};
+let response: Discover = $state(emptyDiscover);
 let mov1: Movie | null = $state(null);
 let mov2: Movie | null = $state(null);
 let guessing = $state(true);
 let winnerId: number | null = $state(null);
 let filterOpen: boolean = $state(true);
 let filters: Filterables = $state(DEFAULT_FILTERS);
+let streak: number = $state(0);
 
 const randomIndex = (limit: number) => {
 	return Math.floor(Math.random() * limit);
@@ -384,9 +392,12 @@ const showResults = (movie: Movie) => {
 
 	// results reveal
 	if (isAnswerRight) {
+		streak = (streak >= 0 ? streak + 1 : 1);
 	} else {
+		streak = (streak <= 0 ? streak - 1 : -1);
 		// 10% chance to fart
-		if (Math.random() < 0.1) {
+		let fartCry: number = 100;
+		if (Math.random() < (fartCry / 100)) {
 			// shuffle farts
 			const farts = [
 				new Audio('sounds/498.mp3'),
@@ -399,7 +410,6 @@ const showResults = (movie: Movie) => {
 		// plus tu es nul, plus on te pète dessus
 		// todo: système de streak
 	}
-	alert(isAnswerRight ? 'yay' : 'u suk');
 };
 
 const openFilters = () => {
@@ -412,17 +422,17 @@ const closeFilters = () => {
 
 const refreshFilters = (updatedFilters: Filterables) => {
 	filters = updatedFilters;
+	matchmake(response.results);
 };
 
 onMount(async () => {
-	// const auth = await tmdb.auth();
-	// response = await tmdb.discover();
-	// console.log($state.snapshot(await response));
+	const auth = await tmdb.auth();
+	response = await tmdb.discover(filters);
 	matchmake(response.results);
 });
 </script>
 
-<main class="flex-grow">
+<main class="flex flex-col flex-grow">
 	<button onclick={openFilters} class="filters-button absolute right-4 top-4 rounded-xl p-4 uppercase">
 		gérer les filtres
 	</button>
@@ -432,8 +442,11 @@ onMount(async () => {
   {#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)}
     <FiltersRecap filters={filters}/>
   {/if}
+	<div class="band flex items justify-center m-2">
+		<div class="streak min-w-10 min-h-10 p-4 rounded-3xl font-bold">Streak : {streak}</div>
+	</div>
 	{#if response.results.length > 0 && mov1 && mov2}
-		<div class="splitview flex items-center w-auto min-h-full">
+		<div class="splitview flex flex-grow items-center w-auto">
 			<div class="left flex-1">
 				<MoviePanel movie={mov1} secret={guessing} {winnerId} onGuess={showResults}/>
 			</div>
@@ -450,6 +463,9 @@ onMount(async () => {
 </main>
 
 <style>
+	.streak {
+		background-color: var(--pink);
+	}
 	.separator {
 		background-color: var(--pink);
 	}

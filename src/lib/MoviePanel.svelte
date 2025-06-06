@@ -16,11 +16,9 @@ $effect(() => {
 	if (!secret) {
 		if (movie.id === winnerId) {
 			// this movie is the better-rated
-			console.log('win: ', movie.title);
 			containerBg.classList.add('fx-win');
 		} else {
 			// this movie lost the battle
-			console.log('lose: ', movie.title);
 			containerImg.classList.add('fx-lose');
 		}
 	} else {
@@ -32,10 +30,13 @@ $effect(() => {
 </script>
 
 <div class="movie min-h-full flex flex-col items-center justify-center relative">
-  <div bind:this={containerBg} class="absolute top-0 left-0 h-full w-full -z-10"></div>
+  <div bind:this={containerBg} class="absolute top-0 left-0 min-h-full min-w-full -z-10"></div>
   <button onclick={handlePick} class="flex flex-col items-center justify-center">
     <img bind:this={containerImg} src="{tmdb.imgBaseURL + movie.poster_path}" alt="movie poster" class="movie-img"/>
-    <h2 class="movie-title font-bold text-xl mt-4 text-center">{movie.title}</h2>
+    <h2 class="movie-title font-bold text-xl mt-4 text-center">
+      {movie.title}
+      <span class="font-light text-sm">({movie.release_date.slice(0, 4)})</span>
+    </h2>
     {#if !secret}
       <div>{movie.vote_average} ({movie.vote_count})</div>
     {/if}
