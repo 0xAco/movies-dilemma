@@ -33,13 +33,18 @@ $effect(() => {
   <div bind:this={containerBg} class="absolute top-0 left-0 min-h-full min-w-full -z-10"></div>
   <button onclick={handlePick} class="flex flex-col items-center justify-center">
     <img bind:this={containerImg} src="{tmdb.imgBaseURL + movie.poster_path}" alt="movie poster" class="movie-img"/>
-    <h2 class="movie-title font-bold text-xl mt-4 text-center">
-      {movie.title}
-      <span class="font-light text-sm">({movie.release_date.slice(0, 4)})</span>
-    </h2>
-    {#if !secret}
-      <div>{movie.vote_average} ({movie.vote_count})</div>
-    {/if}
+    <div class="movie-infos rounded-md p-2 mt-3">
+      <h2 class="movie-title font-bold text-xl text-center">
+        {movie.title}
+        <span class="font-light text-sm">({movie.release_date.slice(0, 4)})</span>
+      </h2>
+      {#if !secret}
+        <div>
+          {movie.vote_average}
+          <span class="font-light text-sm ml-1">({movie.vote_count} votes)</span>
+        </div>
+      {/if}
+    </div>
   </button>
 </div>
 
@@ -60,6 +65,10 @@ $effect(() => {
 .movie-img {
   border-radius: 20px;
   box-shadow: 8px 8px var(--blue);
+}
+
+.movie-infos {
+  background-color: var(--purple-dark);
 }
 
 :global(.fx-win) {

@@ -4,11 +4,15 @@ import tmdb from '../api/tmdb';
 import MoviePanel from './MoviePanel.svelte';
 import FiltersDialog from './FiltersDialog.svelte';
 import FiltersRecap from './FiltersRecap.svelte';
-import { DEFAULT_FILTERS, EMPTY_DISCOVER, DEFAULT_DISCOVER } from '../types/constants';
+import {
+	DEFAULT_FILTERS,
+	EMPTY_DISCOVER,
+	DEFAULT_DISCOVER,
+} from '../types/constants';
 
 const responseDefault: Discover = $state(DEFAULT_DISCOVER);
 const emptyDiscover: Discover = EMPTY_DISCOVER;
-let response: Discover = $state(responseDefault);
+const response: Discover = $state(responseDefault);
 let mov1: Movie | null = $state(null);
 let mov2: Movie | null = $state(null);
 let guessing = $state(true);
@@ -41,12 +45,13 @@ const showResults = (movie: Movie) => {
 
 	// results reveal
 	if (isAnswerRight) {
-		streak = (streak >= 0 ? streak + 1 : 1);
+		streak = streak >= 0 ? streak + 1 : 1;
 	} else {
-		streak = (streak <= 0 ? streak - 1 : -1);
-		// 10% chance to fart
-		let fartCry: number = 100;
-		if (Math.random() < (fartCry / 100)) {
+		streak = streak <= 0 ? streak - 1 : -1;
+		// 5% chance to fart, +10 at each mistake
+		// the worse you are, the more you get farted on
+		const fartCry: number = streak * 10 + 5;
+		if (Math.random() < fartCry / 100) {
 			// shuffle farts
 			const farts = [
 				new Audio('sounds/498.mp3'),
@@ -56,8 +61,6 @@ const showResults = (movie: Movie) => {
 			// launch
 			farts[0].play();
 		}
-		// plus tu es nul, plus on te pète dessus
-		// todo: système de streak
 	}
 };
 
