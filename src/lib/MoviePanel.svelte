@@ -1,13 +1,14 @@
 <script lang="ts">
 import tmdb from '../api/tmdb';
 
-// biome-ignore lint/style/useConst: self assigned by svelte through bind
 let containerBg: HTMLElement;
 let containerImg: HTMLElement;
 
 const { movie, secret, winnerId, onGuess } = $props();
 
 const handlePick = () => {
+	console.log('clicked on a movie', movie.title);
+	console.log('guessing', secret);
 	onGuess(movie);
 };
 
