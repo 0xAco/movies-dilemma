@@ -10,7 +10,7 @@ import {
 	DEFAULT_DISCOVER,
 } from '../types/constants';
 
-let mainElement: HTMLElement;
+let overlayElement: HTMLElement;
 const responseDefault: Discover = $state(DEFAULT_DISCOVER);
 const emptyDiscover: Discover = EMPTY_DISCOVER;
 const response: Discover = $state(responseDefault);
@@ -39,9 +39,7 @@ const showResults = (movie: Movie) => {
 	// cant guess if no movie is loaded
 	if (!mov1 || !mov2) return;
 	const isAnswerRight = movie.id === winnerId;
-	console.log('showResults:', isAnswerRight);
-	console.log('secret = ', secret);
-
+	
 	// results reveal
 	if (isAnswerRight) {
 		if (secret) streak = streak >= 0 ? streak + 1 : 1;
@@ -63,6 +61,7 @@ const showResults = (movie: Movie) => {
 	}
 
 	secret = false;
+	overlayElement.classList.add('z-50');
 };
 
 const openFilters = () => {
@@ -78,17 +77,17 @@ const refreshFilters = (updatedFilters: Filterables) => {
 	matchmake(response.results);
 };
 
-const onMainClick = () => {
+const handleClick = (event: Event) => {
+	event.preventDefault();
 	if (!secret) {
+		// results screen -> find another match
 		matchmake(response.results);
 		secret = true;
-	} else {
-		console.log('CLICK MAIN');
+		overlayElement.classList.remove('z-50');
 	}
 };
 
 onMount(async () => {
-	mainElement.addEventListener('click', onMainClick);
 	// const auth = await tmdb.auth();
 	// response = await tmdb.discover(filters);
 	matchmake(response.results);
@@ -96,16 +95,17 @@ onMount(async () => {
 });
 </script>
 
-<main bind:this="{mainElement}" class="flex flex-col flex-grow">
+<main class="flex flex-col flex-grow">
+	<a bind:this={overlayElement} href="/" onclick={handleClick} role="button" aria-label="overlay for results" class="fixed top-0 bottom-0 right-0 left-0 -z-50 cursor-default"></a>
 	<button onclick={openFilters} class="filters-button absolute right-4 top-4 rounded-xl p-4 uppercase">
 		gérer les filtres
 	</button>
 	{#if filterOpen}
-    <FiltersDialog {filters} onClose={closeFilters} onUpdate={refreshFilters}/>
-  {/if}
-  {#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)}
-    <FiltersRecap filters={filters}/>
-  {/if}
+		<FiltersDialog {filters} onClose={closeFilters} onUpdate={refreshFilters}/>
+	{/if}
+	{#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)}
+		<FiltersRecap filters={filters}/>
+	{/if}
 	<div class="band flex items justify-center m-2">
 		<div class="streak min-w-10 min-h-10 p-4 rounded-3xl font-bold">Streak : {streak}</div>
 	</div>

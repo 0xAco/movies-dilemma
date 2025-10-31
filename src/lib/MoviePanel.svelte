@@ -7,12 +7,12 @@ let containerImg: HTMLElement;
 const { movie, secret, winnerId, onGuess } = $props();
 
 const handlePick = () => {
-	console.log('clicked on a movie', movie.title);
-	console.log('guessing', secret);
+  // results screen, flush the guess
+  if (!secret) return;
 	onGuess(movie);
 };
 
-// detect secret update to display img on container bg
+// detect update of "secret" to display fx on container bg
 $effect(() => {
 	if (!secret) {
 		if (movie.id === winnerId) {
