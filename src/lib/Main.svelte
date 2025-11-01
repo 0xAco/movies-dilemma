@@ -11,9 +11,9 @@ import {
 } from '../types/constants';
 
 let overlayElement: HTMLElement;
-const responseDefault: Discover = $state(DEFAULT_DISCOVER);
+// const responseDefault: Discover = $state(DEFAULT_DISCOVER);
 const emptyDiscover: Discover = EMPTY_DISCOVER;
-const response: Discover = $state(responseDefault);
+let response: Discover = $state(emptyDiscover);
 let mov1: Movie | null = $state(null);
 let mov2: Movie | null = $state(null);
 let secret = $state(true);
@@ -25,6 +25,10 @@ let streak: number = $state(0);
 const randomIndex = (limit: number) => {
 	return Math.floor(Math.random() * limit);
 };
+
+const fetchFilms = async (filters: Filterables) => {
+	return await tmdb.discover(filters);
+}
 
 const matchmake = (movies: Movie[]) => {
 	const indexMov1 = randomIndex(movies.length - 1);
@@ -72,8 +76,9 @@ const closeFilters = () => {
 	filterOpen = false;
 };
 
-const refreshFilters = (updatedFilters: Filterables) => {
+const refreshFilters = async (updatedFilters: Filterables) => {
 	filters = updatedFilters;
+	response = await fetchFilms(filters);
 	matchmake(response.results);
 };
 
@@ -88,8 +93,8 @@ const handleClick = (event: Event) => {
 };
 
 onMount(async () => {
-	// const auth = await tmdb.auth();
-	// response = await tmdb.discover(filters);
+	const auth = await tmdb.auth();
+	if (auth) response = await fetchFilms(filters);
 	matchmake(response.results);
 	secret = true;
 });

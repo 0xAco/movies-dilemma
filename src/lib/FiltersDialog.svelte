@@ -166,12 +166,11 @@ onMount(() => {
 		</div>
 
 		<!-- with_people -->
-		<h2 class="filters-title">acteur·ice·s</h2>
+		<!-- <h2 class="filters-title">acteur·ice·s</h2>
 		<div class="filters-group flex-col justify-start items-start gap-1">
 			<label for="with_people">acteur·ice (séparé·e·s par des virgules) :</label>
-			<!-- todo: remove autocomplete on inputs -->
 			<input type="text" name="with_people" id="with_people" placeholder="ex: Lennifer Jawrance; Thimoté Chalumeau, Gady Lala, Perdo Pacsal, Banny Doon" class="w-full" bind:value={outputPeople} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-		</div>
+		</div> -->
 
 		<!-- primary_release_year -->
 		<h2 class="filters-title">année de sortie</h2>
@@ -187,7 +186,6 @@ onMount(() => {
 		</div>
 
 		<!-- vote_average -->
-		<!-- todo: ensure min <= max in all input range -->
 		<h2 class="filters-title">moyenne</h2>
 		<div class="flex flex-row flex-wrap justify-evenly">
 			<div class="filters-group flex-col items-center">
