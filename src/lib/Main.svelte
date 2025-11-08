@@ -51,7 +51,7 @@ const showResults = (movie: Movie) => {
 		if (secret) streak = streak <= 0 ? streak - 1 : -1;
 		// 5% chance to fart, +10 at each mistake
 		// the worse you are, the more you get farted on
-		const fartCry: number = streak * 10 + 5;
+		const fartCry: number = -1 * streak * 10 + 5;
 		if (Math.random() < fartCry / 100) {
 			// shuffle farts
 			const farts = [
