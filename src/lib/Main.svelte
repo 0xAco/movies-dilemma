@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import tmdb from '../api/tmdb';
+import storage from '../api/localStorage';
 import MoviePanel from './MoviePanel.svelte';
 import FiltersDialog from './FiltersDialog.svelte';
 import FiltersRecap from './FiltersRecap.svelte';
@@ -21,6 +22,10 @@ let winnerId: number | null = $state(null);
 let filterOpen: boolean = $state(false);
 let filters: Filterables = $state(DEFAULT_FILTERS);
 let streak: number = $state(0);
+let initialHigh: string | null = storage.getItem('highscore');
+let initialLow: string | null = storage.getItem('lowscore');
+let highScore: number = $state(initialHigh ? + initialHigh : 0);
+let lowScore: number = $state(initialLow ? + initialLow : 0);
 
 const randomIndex = (limit: number) => {
 	return Math.floor(Math.random() * limit);
@@ -39,6 +44,23 @@ const matchmake = (movies: Movie[]) => {
 	winnerId = mov1.vote_average > mov2.vote_average ? mov1.id : mov2.id;
 };
 
+// updates the streak and stores it into local storage
+const updateStreak = (win: boolean) => {
+	if (win) {
+		streak = streak >= 0 ? streak + 1 : 1;
+		if (streak > highScore) {
+			highScore = streak;
+			storage.addOrUpdate('highscore', `${streak}`);
+		}
+	} else {
+		streak = streak <= 0 ? streak - 1 : -1;
+		if (streak < lowScore) {
+			lowScore = streak;
+			storage.addOrUpdate('lowscore', `${streak}`);
+		}
+	}
+}
+
 const showResults = (movie: Movie) => {
 	// cant guess if no movie is loaded
 	if (!mov1 || !mov2) return;
@@ -46,12 +68,12 @@ const showResults = (movie: Movie) => {
 	
 	// results reveal
 	if (isAnswerRight) {
-		if (secret) streak = streak >= 0 ? streak + 1 : 1;
+		if (secret) updateStreak(true);
 	} else {
-		if (secret) streak = streak <= 0 ? streak - 1 : -1;
+		if (secret) updateStreak(false);
 		// 5% chance to fart, +10 at each mistake
 		// the worse you are, the more you get farted on
-		const fartCry: number = -1 * streak * 10 + 5;
+		const fartCry: number = -streak * 10 + 5;
 		if (Math.random() < fartCry / 100) {
 			// shuffle farts
 			const farts = [
@@ -111,8 +133,10 @@ onMount(async () => {
 	{#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)}
 		<FiltersRecap filters={filters}/>
 	{/if}
-	<div class="band flex items justify-center m-2">
-		<div class="streak min-w-10 min-h-10 p-4 rounded-3xl font-bold">Streak : {streak}</div>
+	<div class="band flex justify-center items-center m-2">
+		<div class="streak streak--min relative rounded-l-2xl min-w-28 min-h-8 text-right p-2 pr-5 -z-10">lowest : {lowScore}</div>
+		<div class="streak streak--current rounded-full min-w-32 min-h-10 text-center p-4 font-bold text-lg">Score : {streak}</div>
+		<div class="streak streak--max relative rounded-r-2xl min-w-28 min-h-8 text-left p-2 pl-5 -z-10">highest : {highScore}</div>
 	</div>
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex flex-grow items-center w-auto">
@@ -134,6 +158,15 @@ onMount(async () => {
 <style>
 	.streak {
 		background-color: var(--pink);
+	}
+	.streak--min {
+		right: -.8rem;
+	}
+	.streak--current {
+		border: solid 5px var(--purple-dark);
+	}
+	.streak--max {
+		left: -.8rem;
 	}
 	.separator {
 		background-color: var(--pink);

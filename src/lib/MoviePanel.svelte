@@ -77,6 +77,7 @@ $effect(() => {
   background-repeat: no-repeat;
   background-position: 50%;
   animation: 60s linear infinite barrel-roll;
+  overflow: hidden;
 }
 
 :global(.fx-lose) {
