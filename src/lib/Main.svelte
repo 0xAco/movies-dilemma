@@ -122,7 +122,7 @@ onMount(async () => {
 });
 </script>
 
-<main class="flex flex-col flex-grow">
+<main class="flex flex-col flex-grow align-middle justify-center">
 	<a bind:this={overlayElement} href="/" onclick={handleClick} role="button" aria-label="overlay for results" class="fixed top-0 bottom-0 right-0 left-0 -z-50 cursor-default"></a>
 	<button onclick={openFilters} class="filters-button absolute right-4 top-4 rounded-xl p-4 uppercase">
 		gérer les filtres
@@ -133,10 +133,10 @@ onMount(async () => {
 	{#if JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS)}
 		<FiltersRecap filters={filters}/>
 	{/if}
-	<div class="band flex justify-center items-center m-2">
-		<div class="streak streak--min relative rounded-l-2xl min-w-28 min-h-8 text-right p-2 pr-5 -z-10">lowest : {lowScore}</div>
-		<div class="streak streak--current rounded-full min-w-32 min-h-10 text-center p-4 font-bold text-lg">Score : {streak}</div>
-		<div class="streak streak--max relative rounded-r-2xl min-w-28 min-h-8 text-left p-2 pl-5 -z-10">highest : {highScore}</div>
+	<div class="band flex justify-center items-center -z-20 p-2">
+		<div class="streak streak--min relative rounded-l-2xl min-w-28 min-h-8 text-right p-2 pr-5 -z-10 shadow-lg">lowest : {lowScore}</div>
+		<div class="streak streak--current rounded-full min-w-32 min-h-10 text-center p-4 font-bold text-lg shadow-lg">Score : {streak}</div>
+		<div class="streak streak--max relative rounded-r-2xl min-w-28 min-h-8 text-left p-2 pl-5 -z-10 shadow-lg">highest : {highScore}</div>
 	</div>
 	{#if response.results.length > 0 && mov1 && mov2}
 		<div class="splitview flex flex-grow items-center w-auto">
@@ -151,11 +151,14 @@ onMount(async () => {
 			</div>
 		</div>
 	{:else}
-		<div>ALERTE CABINET</div>
+		<div class="text-3xl">ALERTE CABINET</div>
 	{/if}
 </main>
 
 <style>
+	.band {
+		background-color: var(--purple-accent);
+	}
 	.streak {
 		background-color: var(--pink);
 	}
@@ -163,7 +166,7 @@ onMount(async () => {
 		right: -.8rem;
 	}
 	.streak--current {
-		border: solid 5px var(--purple-dark);
+		border: solid 5px var(--purple-accent);
 	}
 	.streak--max {
 		left: -.8rem;
